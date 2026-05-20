@@ -1,0 +1,67 @@
+# Default configuration for Agentic Cyber Security System
+
+# General settings
+general:
+  log_level: INFO
+  log_format: json
+  data_dir: ./data
+  reports_dir: ./reports
+
+# GitHub Copilot SDK settings
+copilot:
+  # Authentication mode: 'subscription' or 'byok'
+  auth_mode: byok
+  # For BYOK mode, set the provider and ensure API key is in environment
+  byok_provider: openai  # Options: openai, anthropic, groq, azure, ollama
+  model: gpt-5-mini-2025-08-07  # Cost-effective model with good token limits
+  # Ollama Example:
+  # byok_provider: ollama
+  # model: llama3
+  # base_url: http://localhost:11434/v1  # Optional overlap if default is fine
+  temperature: 0.7
+  max_tokens: 4096
+
+# Threat Detection Agent settings
+threat_detection:
+  enabled: true
+  polling_interval: 60  # seconds
+  alert_threshold: medium  # low, medium, high, critical
+  log_sources:
+    - type: file
+      path: /var/log/syslog
+    - type: file  
+      path: /var/log/auth.log
+  ioc_feeds:
+    - name: abuse_ch
+      url: https://urlhaus.abuse.ch/downloads/csv/
+      update_interval: 3600
+
+# Incident Response Agent settings
+incident_response:
+  enabled: true
+  auto_contain: false  # Set to true for automated containment
+  notification_channels:
+    - type: email
+      recipients: ["security@example.com"]
+    - type: slack
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+  playbooks_dir: ./playbooks
+
+# Vulnerability Management Agent settings
+vulnerability_management:
+  enabled: true
+  scan_schedule: "0 2 * * *"  # Cron format: 2 AM daily
+  scanners:
+    - type: simulated  # Options: simulated, nessus, openvas
+      enabled: true
+  risk_thresholds:
+    critical: 9.0
+    high: 7.0
+    medium: 4.0
+    low: 0.1
+
+# Agent orchestration settings
+orchestration:
+  max_concurrent_agents: 3
+  agent_timeout: 300  # seconds
+  shared_knowledge_base: ./knowledge_base
